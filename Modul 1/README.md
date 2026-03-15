@@ -1,82 +1,131 @@
-# Modul 1: Unsupervised Learning
-
+# Modul 1 — Unsupervised Learning
 ## Daftar Isi
 - [Definisi](#definisi)
-- [Apa saja tipe unsupervised learning](#apa-saja-tipe-unsupervised-learning)
-- [Clustering](#clustering-1)
-    - [Prasyarat](#prasyarat)
-    - [K-Means Clustering](#k-means-clustering)
-    - [Hierarchical Clustering](#hierarchical-clustering)
-    - [DBSCAN](#dbscan)
+- [Tipe-tipe Unsupervised Learning](#tipe-tipe-unsupervised-learning)
+  - [Clustering](#clustering)
+    - [Konsep Dasar Clustering](#konsep-dasar-clustering)
+    - [Prasyarat: Perhitungan Jarak](#prasyarat-perhitungan-jarak)
+    - [Algoritma Clustering](#algoritma-clustering)
+  - [Dimensionality Reduction](#dimensionality-reduction)
 - [Principal Component Analysis](#principal-component-analysis)
 
-<img src="./assets/title.webp" alt="title" width="800" height="300">
+<br>
 
-## Definisi
-Model machine learning yang dilatih dengan data **tanpa** menggunakan label.
+# Definisi
 
-Yang dilakukan model adalah **mempelajari pola dari data**
+<img src="./assets/title.webp" alt="title" width="800">
 
-### Apa saja tipe unsupervised learning
+<br>
 
-**Clustering**
+**Unsupervised Learning** adalah metode dalam *Machine Learning* yang menggunakan **data tanpa label** untuk melatih algoritma.
 
-<img src="./assets/clustering.webp" alt="clustering" width="800" height="400">
+Pada metode ini, model tidak diberikan informasi mengenai jawaban yang benar atau target. Model harus **mencari dan mempelajari pola, struktur, atau hubungan dalam data secara mandiri**.
 
-**Dimensionality Reduction**
+Metode ini sering digunakan untuk:
 
-![DR](./assets/DR.gif)
+- eksplorasi data
+- menemukan pola tersembunyi
+- pengelompokan data
+- analisis struktur dataset
 
-## CLUSTERING
+<br>
 
-Clustering adalah proses mengelompokkan data (objek) ke dalam kelompok-kelompok yang disebut **cluster**. Cluster dikelompokkan berdasarkan **kemiripan** antar objek.
+# Tipe-tipe Unsupervised Learning
 
-**Kemiripan diukur dari jarak antar data**
+# Clustering
 
-Tujuan utama analisis cluster adalah:
-- Meminimalkan Intra Cluster
-- Memaksimalkan Inter-Cluster
+Clustering adalah teknik untuk **mengelompokkan data berdasarkan kemiripan karakteristiknya**.
 
-<img src="./assets/tujuan_cluster.png" alt="tujuan_cluster" width="800" height="300">
+Data yang memiliki karakteristik mirip akan ditempatkan dalam satu kelompok yang disebut **cluster**, sedangkan data yang berbeda akan ditempatkan pada cluster yang berbeda.
 
-### PRASYARAT!!!
+<img src="./assets/clustering.webp" alt="clustering" width="800">
 
-Nah karena kita akan mencari kemiripan antar data dengan jaraknya, kita harus mengetahui cara untuk menghitung jaraknya. Ada beberapa rumus jarak yang bisa dipakai:
+<br>
 
-1. Manhattan Distance
-2. Euclidean Distance
-3. Minkowski Distance
+Contoh penggunaan clustering:
+
+- segmentasi pelanggan
+- pengelompokan dokumen
+- analisis perilaku pengguna
+
+## Konsep Dasar Clustering
+
+Tujuan utama dari clustering adalah:
+
+- **Meminimalkan Intra-cluster Distance**  
+  (jarak antar data di dalam cluster yang sama)
+
+- **Memaksimalkan Inter-cluster Distance**  
+  (jarak antara satu cluster dengan cluster lainnya)
+
+<br>
+
+<img src="./assets/tujuan_cluster.png" alt="tujuan_cluster" width="800">
+
+<br>
+
+Cluster yang baik memiliki:
+
+- jarak antar data dalam cluster kecil
+- jarak antar cluster besar
+
+
+## Prasyarat: Perhitungan Jarak
+
+Karena clustering mengelompokkan data berdasarkan **kedekatan jarak**, kita perlu mengetahui cara menghitung jarak antar data.
+
+Beberapa metode perhitungan jarak yang umum digunakan:
+
+1. **Manhattan Distance**
+2. **Euclidean Distance**
+3. **Minkowski Distance**
+
+<br>
 
 ![distance_1](./assets/distance_1.png)
 
 ![distance_2](./assets/distance_2.png)
 
-### K-Means Clustering
+## Algoritma Clustering
 
-K-Means clustering adalah algoritma yang mengelompokkan **N data** (berdasarkan fitur / atribut) ke dalam **K cluster**. Sebuah cluster di K-Means berpusat pada sebuah **titik centroid**. Selain K-Means, ada juga K-Medians dan [K-Medoids](https://esairina.medium.com/clustering-menggunakan-algoritma-k-medoids-67179a333723).
+Beberapa algoritma clustering yang sering digunakan dalam *Machine Learning* antara lain:
 
-![example_1](./assets/example_1.png)
+- [K-Means Clustering](./K-Means.md)
+- [Hierarchical Clustering](./Hierarchical.md)
+- [DBSCAN](./DBSCAN.md)
 
-**Bagaimana K-Means Bekerja???**
+Setiap algoritma memiliki pendekatan yang berbeda dalam membentuk cluster, misalnya berbasis centroid, hierarki, atau kepadatan data.
 
-![kmeans_1](./assets/kmeans_1.png)
+<br>
 
-### Hierarchical Clustering
+# Dimensionality Reduction
 
-**Definisi** = Algoritma yang menghasilkan cluster dengan cara menyusunnya seperti pohon hirarki
+Dimensionality Reduction adalah teknik untuk **mengurangi jumlah fitur atau variabel dalam dataset** tanpa menghilangkan informasi penting.
 
-![HC](./assets/HC.png)
+Tujuannya antara lain:
 
-**Jenis Hierarchical Clustering**:
-1. Agglomerative (Bottom-Up)
-2. Divisive (Top-Down)
+- mengurangi kompleksitas data
+- mempercepat komputasi
+- mempermudah visualisasi data
 
-### DBSCAN
+<br>
 
-**Definisi** = Density-Based Spatial Clustering of Applications with Noise (DBSCAN) adalah algoritma dasar untuk pengelompokan berbasis density. DBSCAN juga bisa digunakan untuk meng-*handle* outlier.
+![DR](./assets/DR.gif)
 
-![DBSCAN](./assets/DBSCAN.gif)
 
 ## Principal Component Analysis
 
-**Definisi** = Teknik statistik yang digunakan untuk **mereduksi dimensi data** dengan mengubah variabel asli menjadi sekumpulan variabel baru
+**Principal Component Analysis (PCA)** adalah metode *dimensionality reduction* yang mentransformasikan data ke ruang dimensi baru dengan jumlah fitur yang lebih sedikit.
+
+PCA bekerja dengan cara:
+
+1. Menghitung variansi pada setiap fitur
+2. Menentukan arah dengan variansi terbesar
+3. Membentuk **principal components**
+4. Mereduksi dimensi dataset berdasarkan komponen utama tersebut
+
+Metode ini sering digunakan untuk:
+
+- visualisasi data multidimensi
+- kompresi data
+- preprocessing sebelum training model machine learning
