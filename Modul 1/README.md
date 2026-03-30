@@ -129,3 +129,6 @@ Metode ini sering digunakan untuk:
 - visualisasi data multidimensi
 - kompresi data
 - preprocessing sebelum training model machine learning
+
+
+![pendulum](./assets/pendulum.gif)
