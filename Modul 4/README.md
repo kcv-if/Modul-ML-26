@@ -1,309 +1,189 @@
-# Modul 4: CNN & Deployment
+# Modul 4: Reinforcement Learning
 
 ## Daftar Isi
-- [Modul 4: CNN & Deployment](#modul-4-cnn-&-deployment)
-  - [Daftar Isi](#daftar-isi)
-  - [Pengenalan](#pengenalan)
-  - [Deskripsi](#deskripsi)
-    - [CNN Layers](#cnn-layers)
-    - [Contoh Hasil Ektraksi Fitur Gambar dengan CNN](#contoh-hasil-ektraksi-fitur-gambar-dengan-cnn)
-    - [Parameter](#parameter)
-    - [Tambahan Layer Pada CNN](#tambahan-layer-pada-cnn)
-  - [Deployment](#deployment)
-    - [Deployment Options](#deployment-options)
-    - [Example Walkthrough](#example-walkthrough)
+- [Modul 5: Reinforcement Learning](#modul-4-reinforcement-learning)
+    - [Daftar Isi](#daftar-isi)
+    - [Terminologi](#terminologi)
+    - [Pengenalan](#pengenalan)
+    - [Pendekatan Reinforcement Learning](#pendekatan-reinforcement-learning)
+    - [Algoritma](#algoritma)
+        - [Q-Learning](#q-learning)
+        - [NEAT Algorithm](#neat-algorithm)
+
+
+## Terminologi
+- `Agent`: mempunyai tugas untuk mencapai tujuan (goal)
+- `Environment`: memberikan feedback terhadap aksi yang dilakukan Agen
+- `Current State` ($s$): kondisi atau situasi saat ini berdasarkan perspektif Agen
+- `Next State` ($s'$): kondisi atau situasi berikutnya setelah Agen melakukan aksi
+- `Goal`: tujuan yang ingin dicapai oleh Agen
+- `Action` (a): aksi yang akan dipilih Agen untuk mencapai tujuan
+- `Policy` ($\pi$): strategi / kebijakan yang digunakan Agen untuk memilih aksi
+- `Reward` ($R$): sebuah nilai untuk mengukur keberhasilan aksi dari Agen
+- `Penalty`: sebuah nilai untuk mengukur kegagalan aksi dari Agen
 
 ## Pengenalan
-CNN (Convolutional Neural Network) adalah salah satu jenis arsitektur deep learning yang memiliki kemampuan untuk memproses data berupa gambar (walaupun sebenarnya bisa juga digunakan untuk hal lain seperti [Pemrosesan Bahasa Natural (NLP)](https://arxiv.org/abs/1809.02479/1000). Tapi kita tidak bahas hal itu disini). Ada 3 jenis konvolusi yang biasa digunakan pada CNN, yaitu:
-- 1D Convolution: Biasa digunakan untuk data berupa time series / NLP.
-- 2D Convolution: Biasa digunakan untuk data berupa gambar.
-- 3D Convolution: Biasa digunakan untuk data berupa video atau data volumetrik (misalnya, data medis seperti MRI atau CT scan yang memiliki dimensi 3D).
+Reinforcement Learning (RL) adalah sebuah teknik dalam *machine learning* yang mempelajari bagaimana agen harus bertindak dalam sebuah lingkungan agar mendapatkan reward yang maksimal. RL bekerja berdasarkan konsep **trial and error** sehingga agen mengeksplorasi berbagai tindakan, menerima feedback berupa reward atau penalty, dan menyesuaikan strateginya untuk mencapai tujuan yang optimal.
 
-## Deskripsi
+Faktanya, RL banyak digunakan dalam berbagai aplikasi seperti *game*, *robotics*, *recommendation systems*, *search engines*, dan lainnya.
 
-### CNN Layers
-CNN sendiri memiliki beberapa bagian layer, yakni:
-- `Convolutional Layer`: Layer untuk identifikasi fitur sederhana dari gambar (tekstur, garis tepi, dsb).
+> Untuk modul ini, kita akan mengimplemtasikan RL pada *game* sederhana 🎮
 
-<img src="./assets/convolutional.gif" width="900">
+## Pendekatan Reinforcement Learning
+Ada beberapa pendekatan yang dapat digunakan dalam RL, diantaranya:
+1. **Value-Based**: Menentukan policy secara tidak langsung dengan **mempelajari fungsi nilai aksi** $Q(s, a)$ dan memilih aksi dengan nilai tertinggi.
 
-- `Pooling Layer`: Layer untuk mengurangi dimensi dari gambar.
+$$
+Q(s, a) \leftarrow Q(s, a) + \alpha \left( r + \gamma \max_{a'} Q(s', a') - Q(s, a) \right)
+$$
 
-<img src="./assets/pooling.gif" width="900">
+- **$Q(s, a)$** = Seberapa baik Agen dalam mengambil aksi ($a$) pada suatu state ($s$).  
+- **$\alpha$** = *Learning rate* pada fungsi nilai.
+- **$r$** = Reward yang diterima setelah melakukan aksi ($a$).  
+- **$\gamma$** = *Discount factor* yang menentukan seberapa jauh Agen mempertimbangkan reward masa depan.  
+- **$\max_{a'} Q(s', a')$** = Nilai terbaik yang bisa diperoleh dari state selanjutnya ($s'$).  
 
-- `Fully Connected Layer`: Layer untuk menghubungkan hasil dari layer sebelumnya dengan output layer.
+2. **Policy-Based**: **Mempelajari policy $\pi(a | s)$** tanpa perlu fungsi nilai, dengan menggunakan metode optimasi seperti *gradient ascent*.  
 
-<img src="./assets/fully_connect.jpeg" width="900">
+$$
+\nabla J(\theta) = \mathbb{E} \left[ \nabla_{\theta} \log \pi_{\theta} (a | s) R \right]
+$$
 
-### Contoh Hasil Ektraksi Fitur Gambar dengan CNN
+- **$J(\theta)$** = Fungsi objektif berupa reward yang ingin dimaksimalkan.  
+- **$\theta$** = Parameter dari policy ($\pi$)  
+- **$\mathbb{E} [\cdot]$** = Ekspektasi rata-rata dari sampel yang diperoleh selama eksplorasi.
+- **$\nabla_{\theta} \log \pi_{\theta} (a | s)$** = Gradien dari logaritma policy.
+- **$\pi_{\theta} (a | s)$** = Probabilitas memilih aksi ($a$) dalam state ($s$).  
+- **$R$** = Reward total yang diperoleh setelah mengambil aksi ($a$). 
 
-Untuk detail hasil ekstraksi fitur gambar dengan CNN, bisa dilihat pada [notebook ini](./modelling/example_feature_extraction.ipynb).
+> Referensi: [REINFORCE Algorithm](https://medium.com/intro-to-artificial-intelligence/reinforce-a-policy-gradient-based-reinforcement-learning-algorithm-84bde440c816)
 
-### Parameter
-CNN memiliki beberapa parameter, yakni:
-- filters: Jumlah filter (Neuron) yang digunakan pada Convolutional Layer.
-- kernel_size: Ukuran kernel yang digunakan pada Convolutional Layer.
-- strides: Banyaknya "langkah" yang dilakukan filter pada Convolutional Layer.
-- padding: Menambahkan bagian kosong pada tepi gambar.
+3. **Model-Based** membangun **model transisi lingkungan** $P(s' | s, a)$ untuk memprediksi keadaan berikutnya sebelum agen mengambil keputusan.
 
-UNTUK VISUALISASI PARAMETER, BISA DILIHAT PADA:
-1. [Visualisasi 1](https://poloclub.github.io/cnn-explainer/)
-2. [Visualisasi 2](https://ezyang.github.io/convolution-visualizer/index.html)
+$$
+s' \sim P(s' | s, a)
+$$
 
-Berikut ini adalah dokumentasi parameter pada [`tf.keras.layers.Conv2D`](https://www.tensorflow.org/api_docs/python/tf/keras/layers/Conv2D)
+- **$s'$** = Next state setelah Agen mengambil aksi ($a$) pada state ($s$).  
+- **$\sim$** = ($s'$) diambil secara acak dari distribusi probabilitas $P(s' | s, a)$.  
+- **$P(s' | s, a)$** = Probabilitas transisi dari state ($s$) ke state ($s'$) setelah mengambil aksi ($a$).  
 
-### Tambahan Layer Pada CNN
-- `Batch Normalization`:
-Teknik normalisasi yang diterapkan pada setiap mini-batch untuk mengurangi "internal covariate shift" (perubahan distribusi input pada setiap layer selama proses training) yang dapat memperlambat konvergensi model. Paper asli Batch Normalization dapat dilihat [disini](https://arxiv.org/abs/1502.03167).
-- `Dropout`:
-Metode regularisasi untuk mencegah overfitting dengan cara men-drop atau menonaktifkan sebagian neuron pada layer tertentu dengan probabilitas tertentu. Paper asli Dropout dapat dilihat [disini](https://jmlr.org/papers/v15/srivastava14a.html).
-- `Regularization`:
-Metode regularisasi lainnya yang digunakan untuk mencegah overfitting dengan cara menambahkan penalty pada loss function. Ada beberapa jenis regularisasi, seperti L1, L2, dan Elastic Net. Paper asli Regularization dapat dilihat [disini](https://robotics.stanford.edu/~ang/papers/icml04-l1l2.pdf).
+## Algoritma
+### Q-Learning
+Q-Learning adalah salah satu algoritma dalam RL yang termasuk dalam kategori **Value-Based**. Algoritma ini mempelajari fungsi nilai aksi $Q(s, a)$ untuk memaksimalkan reward yang diperoleh Agen.
 
-## Deployment
-Setelah melatih model, langkah selanjutnya adalah menentukan metode deployment yang sesuai dengan use case model kita agar dapat diakses (dengan mudah) oleh sistem atau orang lain. Note bahwa metode yang akan digunakan perlu pertimbangan karena dalam jangka waktu yang panjang akan berpengaruh dalam cost (paling penting ini :pensive:) dan performance (scalability, latency).
+**Contoh Implementasi**
+Untuk implementasinya, bisa di cek pada kode [taxi.py](/Modul%204/Q_Learning/taxi.py). Kode ini merupakan implementasi Q-Learning pada *game* Taxi-v3 dari OpenAI Gym. Goal dari kode ini adalah melatih Agen untuk mengambil penumpang dan mengantarkannya ke tujuan dengan efisien.
 
-### Deployment Options
-Saat membahas metode deployment, beberapa opsi yang umum digunakan (sekarang) adalah cloud-based, on-premise, edge, dan serverless deployment:
+![Taxi-v3](/Modul%204/assets/taxi_image.png)
 
-| Metode      | Keterangan | Kelebihan & Kekurangan | Use Case |
-|-------------|------------|------------------------|----------|
-| Cloud-Based | Model dihosting dan dijalankan pada server dalam virtual network (cloud) biasanya yang dimaintain oleh third-party seperti Amazon Webservice, Google Cloud, atau Microsoft Azure | <li>Scaling on demand (Scalable)</li> <li>Low latency</li> <li>Mudah untuk diimplementasi</li> <li>Recurrent Fees meskipun model tidak/jarang digunakan</li> <li>Vendor lock-in saat menggunakan managed service (Sagemaker, Vertex AI, etc.)</li> | Mid-sized project, consistent model usage |
-| On-Premise  | Model dihosting dan dijalankan pada physical server sendiri | <li>Infrastruktur sangat flexible</li> <li>Tidak ada recurrent fees tetapi harus mengetahui upfront investment (long-term bisa jadi lebih murah dibandingkan cloud)</li> <li>Sulit untuk diimplementasi</li> | Large-scale project dengan investasi besar, enterprise atau korporat |
-| Edge Deployment | Model diletakkan langsung pada edge device (smartphone, IOT, etc.) | <li>Prediksi real-time dan low latency</li> <li>Implementasi straightforward</li> <li>User data secure karena tidak pernah keluar dari device</li> <li>Kurang disarankan untuk model kompleks yang membutuhkan kekuatan komputasi lebih</li> | Hanya disarankan untuk model simple dan lightweight |
-| Serverless Function | Model dihosting pada container dan hanya akan dijalankan jika terdapat request | <li>Cost Effective, hanya membayar sesuai lamanya model dijalankan</li> <li>Hemat resource komputasi</li> <li>Minim manajemen infrastruktur</li> <li>Execution time limit, function akan di "sleep" jika inactive dalam suatu interval waktu tertentu</li> <li>Cold Start, delay saat server menyalakan kembali function yang di"sleep" sebab inactive lama</li> | Untuk development-stage suatu aplikasi atau aplikasi dengan jumlah user sedikit |
-
-### Example Walkthrough
-Kita akan men-deploy model klasifikasi muffin vs chihuahua sebagai [Streamlit](https://docs.streamlit.io/) webapp menggunakan [Hugging Face](https://huggingface.co/).
-
-1. Pada homepage website hugging face, buatlah space baru dengan cara klik icon profile dan pilih opsi `+ New Space`
-
-<img src="./assets/hf_new_space.jpg">
-
-2. Setelah dilanjutkan ke tampilan `Create a new Space`, tentukan Space name dan License, dan pilih SDK Streamlit
-
-<img src="./assets/hf_new_space_setup.jpg">
-
-Jika sudah, klik tombol `Create Space`.
-
-3. Clone repo ke local
-
-```
-git clone https://huggingface.co/spaces/fadhlakmal/muffin-vs-chihuahua-webapp
-cd muffin-vs-chihuahua-webapp
-```
-
-4. Pada root directory, tambahkan `app.py` sebagai entry point app,  `requirements.txt` untuk menentukan dependency yang digunakan pada app, serta model kita
-
-<img src="./assets/hf_files.jpg">
-
-5. **Opsional,** Setup virtual environtment jika tidak ingin menggunakan local environtment
-
-```
-python -m venv venv
-venv\Scripts\activate
-```
-
-6. Install package yang dibutuhkan, catat package tersebut pada `requirement.txt`
-
-```
-pip install streamlit tensorflow pillow
-```
-
-`requirement.txt`:
-```
-pillow==10.4.0
-streamlit==1.39.0
-tensorflow==2.18.0
-```
-
-7. Tambahkan tampilan menggunakan streamlit pada `app.py`
-
-Import package dan setup halaman web
-```py
-# Import necessary libraries
-import streamlit as st              # Streamlit for web app
-import tensorflow as tf             # TensorFlow for the model
-from tensorflow.keras.preprocessing.image import load_img, img_to_array  # Image processing
-import numpy as np                  # Numerical operations
-from PIL import Image              # Image handling
-import io                          # Input/output operations
-
-# Configure the Streamlit page
-st.set_page_config(
-    page_title="Chihuahua vs Muffin Classifier",  # Browser tab title
-    layout="centered"                             # Center the content
-)
-```
-
-Load model ke cache
-```py
-@st.cache_resource  # Cache the model to avoid reloading every time
-def load_model():
-    return tf.keras.models.load_model('CNN_Prak4_ML.h5')  # Load your saved model
-```
-
-Preprocess gambar (pastikan sesuai dengan implementasi masing-masing)
-```py
-def preprocess_image(img):
-    img = img.resize((128, 128))           # Resize to match model's expected input
-    img = img_to_array(img)                # Convert PIL image to numpy array
-    img = np.expand_dims(img, axis=0)      # Add batch dimension
-    img = img / 255.0                      # Normalize pixel values to [0,1]
-    return img
-```
-
-Tambahkan label mapping untuk merubah probabilitas prediksi ke label yang sesuai
-```py
-LABEL_CLASS = {
-    0: "chihuahua",
-    1: "muffin",
-}
-```
-
-Definisikan fungsi main app, streamlit menyediakan beberapa tampilan dan widget sehingga tinggal kita gunakan (selengkapnya baca [dokumentasi](https://docs.streamlit.io/))
-```py
-def main():
-    # Add title and description
-    st.title("Chihuahua vs Muffin Classifier")
-    st.write("Upload an image and the model will predict whether it's a chihuahua or a muffin!")
+```python
+for i in range(training_episodes):
+    state, _ = env.reset()
+    done = False
+    penalties, reward = 0, 0
     
-    # Create file uploader widget
-    uploaded_file = st.file_uploader("Choose an image...", type=["jpg", "jpeg", "png"])
-    
-    if uploaded_file is not None:  # If an image was uploaded
-        # Display the uploaded image
-        image = Image.open(uploaded_file)
-        st.image(image, caption='Uploaded Image', use_column_width=True)
+    while not done:
+        if random.uniform(0, 1) < epsilon:
+            action = env.action_space.sample()
+        else:
+            action = numpy.argmax(q_table[state])
+
+        next_state, reward, done, _, _ = env.step(action) 
         
-        # Create predict button
-        if st.button('Predict'):
-            # Load the model (cached)
-            model = load_model()
-            
-            # Preprocess the image
-            processed_image = preprocess_image(image)
-            
-            # Make prediction with loading spinner
-            with st.spinner('Predicting...'):
-                prediction = model.predict(processed_image)              # Get model prediction
-                pred_class = LABEL_CLASS[np.argmax(prediction)]         # Get predicted class
-                confidence = float(prediction.max()) * 100              # Calculate confidence
-            
-            # Show results
-            st.success(f'Prediction: {pred_class.upper()}')            # Show predicted class
-            st.info(f'Confidence: {confidence:.2f}%')                  # Show confidence
-            
-            # Show probability bars for each class
-            st.write("Class Probabilities:")
-            for i, prob in enumerate(prediction[0]):
-                st.progress(float(prob))                               # Show probability bar
-                st.write(f"{LABEL_CLASS[i]}: {float(prob)*100:.2f}%") # Show probability text
-```
+        old_value = q_table[state, action]
+        next_max = numpy.max(q_table[next_state])
 
-Tambahkan entry point script python
-```py
-if __name__ == "__main__":
-    main() # Run the main function when script is executed
-```
+        # Update q-value
+        new_value = (1 - alpha) * old_value + alpha * (reward + gamma * next_max) # Sesuai rumus Q-Learning
+        q_table[state, action] = new_value
 
-**Full Code**
-```py
-import streamlit as st
-import tensorflow as tf
-from tensorflow.keras.preprocessing.image import load_img, img_to_array
-import numpy as np
-from PIL import Image
-import io
+        if reward == -10:
+            penalties += 1
 
-st.set_page_config(
-    page_title="Chihuahua vs Muffin Classifier",
-    layout="centered"
-)
-
-@st.cache_resource
-def load_model():
-    return tf.keras.models.load_model('CNN_Prak4_ML.h5')
-
-def preprocess_image(img):
-    img = img.resize((128, 128))
-    img = img_to_array(img)
-    img = np.expand_dims(img, axis=0)
-    img = img / 255.0
-    return img
-
-LABEL_CLASS = {
-    0: "chihuahua",
-    1: "muffin",
-}
-
-def main():
-    st.title("Chihuahua vs Muffin Classifier")
-    st.write("Upload an image and the model will predict whether it's a chihuahua or a muffin!")
-    
-    uploaded_file = st.file_uploader("Choose an image...", type=["jpg", "jpeg", "png"])
-    
-    if uploaded_file is not None:
-        image = Image.open(uploaded_file)
-        st.image(image, caption='Uploaded Image', use_column_width=True)
+        state = next_state
         
-        if st.button('Predict'):
-            model = load_model()
-            
-            processed_image = preprocess_image(image)
-            
-            with st.spinner('Predicting...'):
-                prediction = model.predict(processed_image)
-                pred_class = LABEL_CLASS[np.argmax(prediction)]
-                confidence = float(prediction.max()) * 100
-            
-            st.success(f'Prediction: {pred_class.upper()}')
-            st.info(f'Confidence: {confidence:.2f}%')
-            
-            st.write("Class Probabilities:")
-            for i, prob in enumerate(prediction[0]):
-                st.progress(float(prob))
-                st.write(f"{LABEL_CLASS[i]}: {float(prob)*100:.2f}%")
+    if i % 100 == 0:
+        print(f"Episode: {i}")
 
-if __name__ == "__main__":
-    main()
+print("Training finished.\n")
 ```
 
-8. Jalankan app, by default app tersedia pada localhost port 8501
+### NEAT Algorithm
+NEAT (NeuroEvolution of Augmenting Topologies) adalah algoritma yang menggabungkan *genetic algorithm* dan *neural network* untuk menemukan arsitektur jaringan saraf yang optimal. Well, sebenarnya NEAT bukanlah algoritma RL, namun algoritma ini dapat melatih Agen dalam sebuah lingkungan RL.
 
+> Referensi: [NEAT Algorithm](https://nn.cs.utexas.edu/downloads/papers/stanley.ec02.pdf)
+
+**Contoh Implementasi**
+Untuk implementasinya, bisa di cek pada kode [neat_car.py](/Modul%204/NEAT/neat_car.py). Goal dari kode ini adalah melatih mobil untuk mengelilingi lintasan tanpa menabrak dinding.
+
+![NEAT](/Modul%204/assets/neat_car_image.png)
+
+```python
+def run_car(genomes, config):
+    nets = []
+    cars = []
+
+    for id, g in genomes:
+        net = neat.nn.FeedForwardNetwork.create(g, config)
+        nets.append(net)
+        g.fitness = 0
+        cars.append(Car())
+
+    # Init game
+    pygame.init()
+    screen = pygame.display.set_mode((screen_width, screen_height), pygame.DOUBLEBUF)
+    clock = pygame.time.Clock()
+    generation_font = pygame.font.SysFont("Arial", 70)
+    font = pygame.font.SysFont("Arial", 30)
+    map = pygame.image.load(gambar_peta)
+
+    # Main loop
+    global generation
+    generation += 1
+    while True:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                sys.exit(0)
+
+
+        # Input data and get result from network
+        for index, car in enumerate(cars):
+            output = nets[index].activate(car.get_data())
+            i = output.index(max(output))
+            if i == 0:
+                car.angle += 10
+            else:
+                car.angle -= 10
+
+        # Update car and fitness
+        remain_cars = 0
+        for i, car in enumerate(cars):
+            if car.get_alive():
+                remain_cars += 1
+                car.update(map)
+                genomes[i][1].fitness += car.get_reward()
+
+        # check
+        if remain_cars == 0:
+            break
+
+        # Drawing
+        screen.blit(map, (0, 0))
+        for car in cars:
+            if car.get_alive():
+                car.draw(screen)
+
+        text = generation_font.render("Generation : " + str(generation), True, (255, 255, 0))
+        text_rect = text.get_rect()
+        text_rect.center = (screen_width/2, 100)
+        screen.blit(text, text_rect)
+
+        text = font.render("remain cars : " + str(remain_cars), True, (0, 0, 0))
+        text_rect = text.get_rect()
+        text_rect.center = (screen_width/2, 200)
+        screen.blit(text, text_rect)
+
+        pygame.display.update()
+        clock.tick(60)
 ```
-streamlit run app.py
-```
-
-<img src="./assets/hf_localhost.jpg">
-
-Tampilan awal
-<img src="./assets/hf_ui_1.jpg">
-
-Input gambar `Browse files`
-<img src="./assets/hf_ui_2.jpg">
-
-Menunggu hasil prediksi `Predict`
-<img src="./assets/hf_ui_3.jpg">
-
-Output prediksi
-<img src="./assets/hf_ui_4.jpg">
-
-9. Jika sudah puas dengan tampilan, commit dan push perubahan (exclude venv) ke repository huggingface atau secara manual tambahkan pada `files` di space
-
-a. Menambahkan perubahan via cli
-```
-git add .
-git commit -m "Add files"
-git push
-```
-b. Menambahkan ke `files` secara manual
-<img src="./assets/hf_space_files.jpg">
-
-<img src="./assets/hf_manual.jpg">
-
-Kemudian klik `commit to main`
-
-10. Setelah build selesai, webapp dapat diakses pada `https://huggingface.co/spaces/{Username}/{Nama Space}` (Contoh https://huggingface.co/spaces/fadhlakmal/muffin-vs-chihuahua-webapp)
-
-<img src="./assets/hf_deployment_success.jpg">
