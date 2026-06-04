@@ -1,7 +1,7 @@
 # Modul 4: Reinforcement Learning
 
 ## Daftar Isi
-- [Modul 5: Reinforcement Learning](#modul-4-reinforcement-learning)
+- [Modul 4: Reinforcement Learning](#modul-4-reinforcement-learning)
     - [Daftar Isi](#daftar-isi)
     - [Terminologi](#terminologi)
     - [Pengenalan](#pengenalan)
